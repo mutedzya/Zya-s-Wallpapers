@@ -10,8 +10,9 @@
             --bg-color: #0f0f12;
             --card-bg: #1a1a24;
             --text-color: #ffffff;
-            --accent-color: #8a2be2; /* Purple accent to match your car image */
+            --accent-color: #8a2be2;
             --text-secondary: #a0a0b0;
+            --overlay-bg: rgba(0, 0, 0, 0.9);
         }
 
         [data-theme="light"] {
@@ -20,6 +21,7 @@
             --text-color: #1a1a24;
             --accent-color: #6a1b9a;
             --text-secondary: #606070;
+            --overlay-bg: rgba(255, 255, 255, 0.95);
         }
 
         /* Reset & Base Styles */
@@ -56,7 +58,6 @@
             color: var(--accent-color);
         }
 
-        /* Dark Mode Toggle Button */
         .theme-toggle {
             background: var(--accent-color);
             color: white;
@@ -101,6 +102,8 @@
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
         }
 
         .card img {
@@ -108,6 +111,12 @@
             height: 200px;
             object-fit: cover;
             display: block;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .card img:hover {
+            transform: scale(1.03);
         }
 
         .card-content {
@@ -115,11 +124,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-top: auto; /* Keeps elements perfectly aligned */
         }
 
         .card-title {
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: 1rem;
+            padding-right: 10px;
         }
 
         .download-btn {
@@ -132,6 +143,7 @@
             text-decoration: none;
             font-size: 0.85rem;
             font-weight: 600;
+            white-space: nowrap;
         }
 
         .download-btn:hover {
@@ -139,12 +151,52 @@
             color: white;
         }
 
-        /* Footer / Discord Contact Section */
+        /* Preview Lightbox Modal */
+        .preview-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--overlay-bg);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .preview-overlay img {
+            max-width: 90%;
+            max-height: 85%;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .close-preview {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 2.5rem;
+            color: var(--text-color);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* Footer & Community / Rating Sections */
         footer {
             margin-top: 80px;
-            text-align: center;
             padding: 40px 20px;
             background-color: var(--card-bg);
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            align-items: center;
+            text-align: center;
         }
 
         footer p {
@@ -154,7 +206,7 @@
 
         .discord-btn {
             display: inline-block;
-            background-color: #5865F2; /* Official Discord Purple */
+            background-color: #5865F2;
             color: white;
             text-decoration: none;
             padding: 12px 24px;
@@ -165,6 +217,61 @@
 
         .discord-btn:hover {
             background-color: #4752c4;
+        }
+
+        /* Rating System Section */
+        .rating-box {
+            background: rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid rgba(128, 128, 128, 0.1);
+        }
+
+        .rating-box h3 {
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .stars {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-direction: row-reverse; /* Allows pure CSS hover effects */
+        }
+
+        .stars input {
+            display: none;
+        }
+
+        .stars label {
+            font-size: 2rem;
+            color: #444;
+            cursor: pointer;
+            transition: color 0.1s;
+        }
+
+        /* Highlighting stars on hover and selection */
+        .stars label:hover,
+        .stars label:hover ~ label,
+        .stars input:checked ~ label {
+            color: #ffcc00;
+        }
+
+        .submit-rating-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .submit-rating-btn:hover {
+            opacity: 0.9;
         }
     </style>
 </head>
@@ -177,14 +284,14 @@
 
     <section class="hero">
         <h2>Welcome to Zya's Wallpapers</h2>
-        <p>High-quality, handpicked backgrounds for your desktop.</p>
+        <p>High-quality, handpicked backgrounds for your desktop. Click an image to preview!</p>
     </section>
 
     <main class="gallery-container">
         <div class="grid">
             
             <div class="card">
-                <img src="Ferrari FXX-K EVO.jpg" alt="Ferrari FXX-K Evo">
+                <img src="Ferrari FXX-K EVO.jpg" alt="Ferrari FXX-K Evo" class="preview-trigger">
                 <div class="card-content">
                     <span class="card-title">Ferrari FXX-K Evo</span>
                     <a href="Ferrari FXX-K EVO.jpg" download class="download-btn">Download</a>
@@ -192,7 +299,7 @@
             </div>
 
             <div class="card">
-                <img src="Ferrari FXX-K EVO 2.jpg" alt="Ferrari FXX-K Evo Front">
+                <img src="Ferrari FXX-K EVO 2.jpg" alt="Ferrari FXX-K Evo Front" class="preview-trigger">
                 <div class="card-content">
                     <span class="card-title">Ferrari FXX-K Evo Front</span>
                     <a href="Ferrari FXX-K EVO 2.jpg" download class="download-btn">Download</a>
@@ -200,15 +307,15 @@
             </div>
 
             <div class="card">
-                <img src="Ferrari FXX-K EVO Back.jpg" alt="Ferrari FXX-K Evo Back">
+                <img src="Ferrari FXX-K EVO Back.jpg" alt="Ferrari FXX-K Evo Back" class="preview-trigger">
                 <div class="card-content">
                     <span class="card-title">Ferrari FXX-K Evo Back</span>
-                    <a href="Ferrari FXX-K EVO Back" download class="download-btn">Download</a>
+                    <a href="Ferrari FXX-K EVO Back.jpg" download class="download-btn">Download</a>
                 </div>
             </div>
 
             <div class="card">
-                <img src="Porsche 911 GT3 RS Front Left.jpg" alt="Porsche 911 GT3 RS Front">
+                <img src="Porsche 911 GT3 RS Front Left.jpg" alt="Porsche 911 GT3 RS Front" class="preview-trigger">
                 <div class="card-content">
                     <span class="card-title">Porsche 911 GT3 RS Front</span>
                     <a href="Porsche 911 GT3 RS Front Left.jpg" download class="download-btn">Download</a>
@@ -216,7 +323,7 @@
             </div>
 
             <div class="card">
-                <img src="Porsche 911 GT3 RS back.jpg" alt="Porsche 911 GT3 RS Back">
+                <img src="Porsche 911 GT3 RS back.jpg" alt="Porsche 911 GT3 RS Back" class="preview-trigger">
                 <div class="card-content">
                     <span class="card-title">Porsche 911 GT3 RS Back</span>
                     <a href="Porsche 911 GT3 RS back.jpg" download class="download-btn">Download</a>
@@ -224,7 +331,7 @@
             </div>
 
             <div class="card">
-                <img src="Porsche 911 GT3 RS Side Right.jpg" alt="Porsche 911 GT3 RS Side">
+                <img src="Porsche 911 GT3 RS Side Right.jpg" alt="Porsche 911 GT3 RS Side" class="preview-trigger">
                 <div class="card-content">
                     <span class="card-title">Porsche 911 GT3 RS Side</span>
                     <a href="Porsche 911 GT3 RS Side Right.jpg" download class="download-btn">Download</a>
@@ -234,17 +341,37 @@
         </div>
     </main>
 
+    <div class="preview-overlay" id="previewOverlay">
+        <span class="close-preview" id="closePreview">&times;</span>
+        <img id="previewImage" src="" alt="Fullscreen Preview">
+    </div>
+
     <footer>
-        <p>Want to submit a wallpaper or hang out with the community?</p>
-        <a href="YOUR_DISCORD_LINK_HERE" target="_blank" class="discord-btn">Join our Discord Server <strong>Soon</strong></a>
+        <div class="footer-content">
+            <div class="community-box">
+                <p>Want to submit a wallpaper or hang out with the community?</p>
+                <a href="YOUR_DISCORD_LINK_HERE" target="_blank" class="discord-btn">Join our Discord Server <strong>Soon</strong></a>
+            </div>
+
+            <form class="rating-box" action="https://formspree.io/f/mjgqpapg" method="POST">
+                <h3>Rate Zya's Wallpapers</h3>
+                <div class="stars">
+                    <input type="radio" id="star5" name="rating" value="5"><label for="star5">★</label>
+                    <input type="radio" id="star4" name="rating" value="4"><label for="star4">★</label>
+                    <input type="radio" id="star3" name="rating" value="5"><label for="star3">★</label>
+                    <input type="radio" id="star2" name="rating" value="2"><label for="star2">★</label>
+                    <input type="radio" id="star1" name="rating" value="1"><label for="star1">★</label>
+                </div>
+                <button type="submit" class="submit-rating-btn">Submit Feedback</button>
+            </form>
+        </div>
     </footer>
 
     <script>
+        // Theme Toggle Logic
         const toggleBtn = document.getElementById('themeToggle');
-        
         toggleBtn.addEventListener('click', () => {
             const currentTheme = document.documentElement.getAttribute('data-theme');
-            
             if (currentTheme === 'light') {
                 document.documentElement.removeAttribute('data-theme');
                 toggleBtn.textContent = 'Light Mode';
@@ -253,7 +380,25 @@
                 toggleBtn.textContent = 'Dark Mode';
             }
         });
+
+        // Fullscreen Image Preview Logic
+        const overlay = document.getElementById('previewOverlay');
+        const previewImg = document.getElementById('previewImage');
+        const closeBtn = document.getElementById('closePreview');
+        const triggers = document.querySelectorAll('.preview-trigger');
+
+        triggers.forEach(img => {
+            img.addEventListener('click', () => {
+                previewImg.src = img.src;
+                overlay.style.display = 'flex';
+            });
+        });
+
+        // Close preview box when clicking 'X' or the background
+        closeBtn.addEventListener('click', () => overlay.style.display = 'none');
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) overlay.style.display = 'none';
+        });
     </script>
 </body>
 </html>
-<!--Comment-->
